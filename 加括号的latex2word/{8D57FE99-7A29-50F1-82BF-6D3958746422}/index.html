@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins.js"></script>
+    <script>
+        window.Asc.plugin.init = function() {
+            // 将你的调试好的代码封装在 callCommand 中，注入文档底层运行
+            this.callCommand(function() {
+                var doc = Api.GetDocument();
+                var sel = doc.GetRangeBySelect();
+                if (!sel) return;
+
+                var latex = sel.GetText();
+                if (!latex || !latex.trim()) return;
+
+                function trimOuter(s) {
+                    return s.replace(/^[\u200B\uFEFF\s]+|[\u200B\uFEFF\s]+$/g, "");
+                }
+
+                function unwrapMath(s) {
+                    s = trimOuter(s);
+                    var prev;
+                    do {
+                        prev = s;
+                        s = s.replace(/^\$\$([\s\S]*?)\$\$$/, "$1");
+                        s = s.replace(/^\$([\s\S]*?)\$$/, "$1");
+                        s = s.replace(/^\\\[([\s\S]*?)\\\]$/, "$1");
+                        s = s.replace(/^\\\(([\s\S]*?)\\\)$/, "$1");
+                        s = trimOuter(s);
+                    } while (s !== prev);
+                    return s;
+                }
+
+                function getNextEqNumber() {
+                    var names = doc.GetAllBookmarksNames();
+                    var maxNum = 0;
+                    for (var i = 0; i < names.length; i++) {
+                        var m = /^eq_(\d+)$/.exec(names[i]);
+                        if (m) {
+                            var n = parseInt(m[1], 10);
+                            if (n > maxNum) maxNum = n;
+                        }
+                    }
+                    return maxNum + 1;
+                }
+
+                latex = unwrapMath(latex);
+                if (!latex) return;
+
+                var eqNum = getNextEqNumber();
+
+                // 1. 删除原文本
+                sel.Delete();
+
+                // 2. 创建 3x1 布局表格
+                var oTable = Api.CreateTable(3, 1);
+                oTable.SetWidth("percent", 100);
+
+                // 3. 隐藏边框
+                try {
+                    oTable.SetTableBorderTop("nil", 0, 0, 0, 0, 0);
+                    oTable.SetTableBorderBottom("nil", 0, 0, 0, 0, 0);
+                    oTable.SetTableBorderLeft("nil", 0, 0, 0, 0, 0);
+                    oTable.SetTableBorderRight("nil", 0, 0, 0, 0, 0);
+                    oTable.SetTableBorderInsideV("nil", 0, 0, 0, 0, 0);
+                    oTable.SetTableBorderInsideH("nil", 0, 0, 0, 0, 0);
+                } catch (e) {}
+
+                // 4. 插入表格
+                doc.InsertContent([oTable]);
+
+                var row = oTable.GetRow(0);
+                row.SetHeight("atLeast", 1440); 
+
+                var cellLeft   = oTable.GetCell(0, 0);
+                var cellCenter = oTable.GetCell(0, 1);
+                var cellRight  = oTable.GetCell(0, 2);
+
+                cellLeft.SetWidth("percent", 15);
+                cellCenter.SetWidth("percent", 70);
+                cellRight.SetWidth("percent", 15);
+
+                // 5. 设置对齐：垂直居中
+                cellCenter.SetVerticalAlign("center");
+                cellRight.SetVerticalAlign("center");
+
+                var pCenter = cellCenter.GetContent().GetElement(0);
+                var pRight  = cellRight.GetContent().GetElement(0);
+
+                pCenter.SetJc("center");
+                pRight.SetJc("right");
+
+                // 6. 中间插公式
+                pCenter.Select();
+                doc.AddMathEquation(latex, "latex");
+
+                // 7. 右侧插编号并微调位置
+                pRight.AddText("(" + eqNum + ")");
+                pRight.SetPosition(-6); 
+
+                // 8. 添加书签用于递增
+                var rNum = pRight.GetRange();
+                if (rNum) {
+                    rNum.AddBookmark("eq_" + eqNum);
+                }
+
+            }, false, true, function() {
+                // 运行完自动关闭插件界面，无感操作
+                window.Asc.plugin.executeCommand("close", "");
+            });
+        };
+    </script>
+</head>
+<body style="margin: 0;"></body>
+</html>

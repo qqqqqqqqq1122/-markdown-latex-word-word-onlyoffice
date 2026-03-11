@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins.js"></script>
+    <script>
+        window.Asc.plugin.init = function() {
+            this.callCommand(function() {
+                var doc = Api.GetDocument();
+
+                // 1. 建 3列1行表格
+                var oTable = Api.CreateTable(3, 1);
+                oTable.SetWidth("percent", 100);
+
+                // 固定布局，列宽更稳
+                oTable.SetTableLayout("fixed");
+
+                // 2. 去掉所有表格边框
+                try {
+                    oTable.SetTableBorderTop("nil", 0, 0, 0, 0, 0);
+                    oTable.SetTableBorderBottom("nil", 0, 0, 0, 0, 0);
+                    oTable.SetTableBorderLeft("nil", 0, 0, 0, 0, 0);
+                    oTable.SetTableBorderRight("nil", 0, 0, 0, 0, 0);
+                    oTable.SetTableBorderInsideH("nil", 0, 0, 0, 0, 0);
+                    oTable.SetTableBorderInsideV("nil", 0, 0, 0, 0, 0);
+                } catch (e) {}
+
+                // 3. 取唯一一行，并给一个“至少高度”
+                var oRow = oTable.GetRow(0);
+                oRow.SetHeight("atLeast", 480); 
+
+                // 4. 取三个单元格
+                var cellLeft   = oTable.GetCell(0, 0);
+                var cellCenter = oTable.GetCell(0, 1);
+                var cellRight  = oTable.GetCell(0, 2);
+
+                // 5. 设列宽：15% / 70% / 15%
+                cellLeft.SetWidth("percent", 15);
+                cellCenter.SetWidth("percent", 70);
+                cellRight.SetWidth("percent", 15);
+
+                // 6. 单元格内容垂直居中 (解决公式与编号重心不对齐的核心)
+                cellCenter.SetVerticalAlign("center");
+                cellRight.SetVerticalAlign("center");
+
+                // 7. 中间段落：居中
+                var pCenter = cellCenter.GetContent().GetElement(0);
+                pCenter.SetJc("center");
+
+                // 8. 右侧段落：右对齐，预放括号
+                var pRight = cellRight.GetContent().GetElement(0);
+                pRight.SetJc("right");
+                pRight.AddText("()");
+
+                // 9. 右侧括号整体轻微下移，视觉上更接近分数线
+                pRight.SetPosition(-6); 
+
+                // 10. 插入表格到当前光标位置
+                doc.InsertContent([oTable]);
+
+                // 11. 把光标放到中间单元格，方便直接插入公式
+                pCenter.Select();
+
+            }, false, true, function() {
+                window.Asc.plugin.executeCommand("close", "");
+            });
+        };
+    </script>
+</head>
+<body style="margin: 0;"></body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "公式排版表",
+  "guid": "asc.{8D57FE99-7A29-50F1-82BF-6D3958746422}",
+  "version": "1.0",
+  "variations": [
+    {
+      "description": "一键生成标准学术论文的公式排版隐形表格",
+      "url": "index.html",
+      "icons": ["icon.png"],
+      "isViewer": false,
+      "EditorsSupport": ["word"],
+      "isVisual": false,
+      "isModal": false,
+      "isInsideMode": false,
+      "initDataType": "none",
+      "initData": "",
+      "buttons": []
+    }
+  ]
+}

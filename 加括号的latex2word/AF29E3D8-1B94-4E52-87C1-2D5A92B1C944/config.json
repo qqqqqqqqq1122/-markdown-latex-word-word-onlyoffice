@@ -1,0 +1,20 @@
+{
+  "name": "插入公式排版架",
+  "guid": "asc.{AF29E3D8-1B94-4E52-87C1-2D5A92B1C944}",
+  "version": "1.0",
+  "variations": [
+    {
+      "description": "一键插入带括号且垂直居中的公式排版隐形表格",
+      "url": "index.html",
+      "icons": ["icon.png"],
+      "isViewer": false,
+      "EditorsSupport": ["word"],
+      "isVisual": false,
+      "isModal": false,
+      "isInsideMode": false,
+      "initDataType": "none",
+      "initData": "",
+      "buttons": []
+    }
+  ]
+}
