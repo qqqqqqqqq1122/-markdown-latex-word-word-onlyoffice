@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins.js"></script>
+    <script>
+        // 插件初始化（当你点击按钮时触发）
+        window.Asc.plugin.init = function() {
+            
+            // callCommand 用来将代码注入到文档底层运行
+            this.callCommand(function() {
+                var doc = Api.GetDocument();
+                var range = doc.GetRangeBySelect();
+                if (!range) return;
+                
+                var text = range.GetText();
+                if (!text || text.trim() === "") return;
+                
+                // 核心净水器
+                var cleanText = text.trim()
+                    .replace(/^(\$\$?|\\\[|\\\()\s*/, "")
+                    .replace(/\s*(\$\$?|\\\]|\\\))$/, "");
+                
+                // 删除原文本并插入公式
+                range.Delete();
+                doc.AddMathEquation(cleanText, "latex");
+                
+            }, false, true, function() {
+                // 代码运行完后，立刻自我关闭，不留痕迹
+                window.Asc.plugin.executeCommand("close", "");
+            });
+        };
+    </script>
+</head>
+<body style="margin: 0;"></body>
+</html>

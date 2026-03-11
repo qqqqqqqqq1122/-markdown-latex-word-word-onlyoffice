@@ -1,0 +1,20 @@
+{
+  "name": "转公式",
+  "guid": "asc.{6B36ED69-6B18-40F0-91AF-5C2849845311}",
+  "version": "1.0",
+  "variations": [
+    {
+      "description": "将选中的LaTeX转化为原生公式",
+      "url": "index.html",
+      "icons": ["icon.png"],
+      "isViewer": false,
+      "EditorsSupport": ["word"],
+      "isVisual": false,
+      "isModal": false,
+      "isInsideMode": false,
+      "initDataType": "none",
+      "initData": "",
+      "buttons": []
+    }
+  ]
+}
